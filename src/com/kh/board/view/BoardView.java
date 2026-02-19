@@ -1,8 +1,16 @@
 package com.kh.board.view;
 
+import java.util.List;
+import java.util.Scanner;
+
+import com.kh.board.controller.BoardController;
+import com.kh.board.model.vo.Board;
+
 public class BoardView {
 	// 입력을 위한 Scanner변수 선언 및 초기화
+	private Scanner sc = new Scanner(System.in);
 	// 기능 실행을 위한 BoardController 변수 선언 및 초기화.
+	private BoardController bc = new BoardController();
 	String memberId = null;
 	/**
 	 * 로그인 기능.
@@ -14,8 +22,20 @@ public class BoardView {
 		System.out.println("### 게시판 서비스###");
 		System.out.println("서비스 이용을 위해 로그인을 진행해주세요.");
 		System.out.print("ID");
-		System.out.print("PWD");		
+		String id = sc.nextLine();
 		
+		System.out.print("PWD");
+		String pwd = sc.nextLine();
+		
+		boolean result = bc.login(id,pwd);
+		if(result) {
+			//로그인 성공 
+			memberId = id;
+			mainMenu();
+		}else {
+			//로그인 실패
+			login();
+		}
 	}
 	
 	/**
@@ -32,7 +52,22 @@ public class BoardView {
 			System.out.println("3. 게시판 등록하기");
 			System.out.println("4. 게시판 수정하기");
 			System.out.println("5. 게시판 삭제하기");			
-			System.out.println("9. 끝");			
+			System.out.println("9. 끝");		
+			int menu = sc.nextInt();
+			sc.nextLine();
+			
+			switch(menu) {
+			case 1 -> selectBoardList();
+			case 2 -> selectBoard();
+			case 3 -> insertBoard();
+			case 4 -> updateBoard();
+			case 5 -> deleteBoard();
+			case 9 -> {
+				System.out.println("프로그램을 종료합니다.");
+				return;
+				}
+			}
+			
 		}
 	}
 	/** 
@@ -42,6 +77,13 @@ public class BoardView {
 	 * */
 	public void selectBoardList() {
 		System.out.println("게시글 번호\t게시글 제목\t작성자\t작성시간");
+		List<Board> list = bc.selectBoardList();
+		for(Board b : list) {
+			System.out.printf("%d\t%s\t%s\t%s\n", 
+		b.getBno(), b.getTitle(), b.getWriter(), b.getCreateDate());
+		}
+		
+		
 	}
 	
 	/** 
@@ -62,7 +104,19 @@ public class BoardView {
 	 * 사용자로 하여금 게시글 제목과, 내용을 입력받아 게시글을 등록요청을 보내는 메소드
 	 * */
 	public void insertBoard() {
+		System.out.print("게시글 제목 : ");
+		String title = sc.nextLine();
 		
+		System.out.print("게시글 내용 : ");
+		String content = sc.nextLine();
+		
+		int result = bc.insertBoard(title, content, memberId);
+		
+		if(result > 0) {
+			System.out.println("게시글 등록 성공");
+		}else {
+			System.out.println("게시글 등록 실패");
+		}
 	}
 	
 	/** 
